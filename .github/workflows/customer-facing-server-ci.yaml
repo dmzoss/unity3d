@@ -1,0 +1,29 @@
+name: Customer facing server CI
+
+on:
+  push:
+    paths:
+      - 'customer-facing-server/**'
+  workflow_dispatch:
+
+
+jobs:
+  build-customer-facing-server:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - uses: docker/login-action@v1
+        with:
+          registry: registry-1.docker.io
+          username: ${{ secrets.DH_USER }}
+          password: ${{ secrets.DH_SECRET }}
+
+      - uses: int128/kaniko-action@v1
+        with:
+          context: ./customer-facing-server
+          file: ./customer-facing-server/Dockerfile
+          push: true
+          tags: registry-1.docker.io/${{ vars.DH_PROJECT }}/customer-facing-server:latest

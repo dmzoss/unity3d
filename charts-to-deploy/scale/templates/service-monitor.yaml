@@ -1,0 +1,25 @@
+{{- if .Values.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ingress-nginx-controller-metrics
+  labels:
+    {{- range $key, $value := .Values.serviceMonitor.labels }}
+    {{ $key }}: {{ $value }}
+    {{- end }}
+spec:
+  endpoints:
+  - interval: {{ .Values.serviceMonitor.interval }}
+    port: {{ .Values.serviceMonitor.port }}
+    path: {{ .Values.serviceMonitor.path }}
+    scheme: http
+    scrapeTimeout: {{ .Values.serviceMonitor.scrapeTimeout }}
+  selector:
+    matchLabels:
+      {{- range $key, $value := .Values.serviceMonitor.selector.matchLabels }}
+      {{ $key }}: {{ $value }}
+      {{- end }}
+  namespaceSelector:
+    matchNames:
+    - {{ .Values.serviceMonitor.namespace }}
+{{- end }}

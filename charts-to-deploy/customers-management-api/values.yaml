@@ -1,0 +1,14 @@
+replicaCount: 1
+image:
+  repository: registry-1.docker.io/mypersonaluser/customers-management-api
+  tag: latest
+  pullPolicy: Always
+service:
+  type: ClusterIP
+  port: 8001
+env:
+  MONGODB_URI: mongodb://mongo:27017
+  MONGODB_DB: customers_db
+  MONGODB_COLLECTION: customers
+  KAFKA_BROKER: kafka:9092
+  KAFKA_TOPIC: purchases
