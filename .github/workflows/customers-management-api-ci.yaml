@@ -1,0 +1,29 @@
+name: customers-management-api CI
+
+on:
+  push:
+    paths:
+      - 'customers-management-api/**'
+  workflow_dispatch:
+
+
+jobs:
+  build-customers-management-api:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - uses: docker/login-action@v1
+        with:
+          registry: registry-1.docker.io
+          username: ${{ secrets.DH_USER }}
+          password: ${{ secrets.DH_SECRET }}
+
+      - uses: int128/kaniko-action@v1
+        with:
+          context: ./customers-management-api
+          file: ./customers-management-api/Dockerfile
+          push: true
+          tags: registry-1.docker.io/${{vars.DH_PROJECT }}/customers-management-api:latest

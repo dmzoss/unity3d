@@ -1,0 +1,33 @@
+replicaCount: 1
+image:
+  repository: registry-1.docker.io/mypersonaluser/customer-facing-server
+  tag: latest
+  pullPolicy: Always
+service:
+  type: ClusterIP
+  port: 8002
+ingress:
+  enabled: true
+  className: nginx
+  annotations: {}
+  rules:
+  - host: ""
+    paths:
+    - path: /getAllUserBuys
+      pathType: Prefix
+      backend:
+        service:
+          name: customer-facing-server
+          port:
+            number: 8002
+    - path: /buy
+      pathType: Prefix
+      backend:
+        service:
+          name: customer-facing-server
+          port:
+            number: 8002
+env:
+  KAFKA_BROKER: kafka:9092
+  KAFKA_TOPIC: purchases
+  DATA_MANAGER_SERVICE: http://customers-management-api:8001
