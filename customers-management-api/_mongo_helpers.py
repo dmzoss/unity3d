@@ -43,7 +43,7 @@ class MongoHelper:
         collection.insert_one(document)
         
 
-    def get_the_last_message(self, partition: int) -> list[pymongo.CursorType]: #! TODO fix the return type
+    def get_the_last_message(self, partition: int) -> list:
         """Get the last message stored in MongoDB by offset."""
 
         collection = self.get_collection(MONGODB_COLLECTION)
@@ -64,12 +64,3 @@ class MongoManager(MongoHelper):
             return True
         except pymongo.errors.ConnectionFailure:
             return False
-
-if __name__ == "__main__":
-    
-    helper = MongoHelper()
-    print(helper.get_collection_data(MONGODB_COLLECTION))
-    # helper.insert_document(MONGODB_COLLECTION, {"name": "Alice", "address": "Wonderland", "_offset": 7000, "_partition": 0})
-    # print(helper.get_the_last_message(0))
-    # for doc in helper.get_the_last_message(0):
-    #     print(doc)

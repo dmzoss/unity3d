@@ -1,7 +1,7 @@
 import logging
 import sys
 
-def setup_logger(name):
+def setup_logger(name) -> logging.Logger:
     """
     Set up a logger with consistent configuration across all modules.
     """

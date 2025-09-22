@@ -15,7 +15,7 @@ logging.basicConfig(
 )
 
 
-def check_kafka_connection():
+def check_kafka_connection() -> None:
     while True:
         try:
             kafka_admin = KafkaAdminWrapper()
@@ -25,13 +25,11 @@ def check_kafka_connection():
             logging.error(f"Error occurred: {e}")
             logging.info("Retrying to connect to Kafka broker in 5 seconds...")
             sleep(5)
-            
-            
-def prepare_system():
-    
 
+
+def prepare_system() -> None:
+    """Prepare the system by checking Kafka connection."""
     check_kafka_process = Process(target=check_kafka_connection)
 
     check_kafka_process.start()
     check_kafka_process.join()
-
