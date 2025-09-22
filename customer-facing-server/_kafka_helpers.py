@@ -1,9 +1,11 @@
-import json
 import os
 import logging
 import sys
 from kafka import KafkaProducer
 from kafka.admin import KafkaAdminClient
+
+from utils import serializer
+
 
 KAFKA_BROKER = os.getenv("KAFKA_BROKER")
 KAFKA_TOPIC = os.getenv("KAFKA_TOPIC")
@@ -17,10 +19,6 @@ logging.basicConfig(
     ]
 )
 
-# Messages will be serialized as JSON 
-def serializer(message):
-    return json.dumps(message).encode('utf-8')
-
 
 class KafkaProducerWrapper:
     def __init__(self):
@@ -30,24 +28,27 @@ class KafkaProducerWrapper:
         )
         self.topic = KAFKA_TOPIC
 
-    def get_producer(self):
+
+    def get_producer(self) -> KafkaProducer:
         return self.producer
 
-    def send_purchase_data(self, purchase_data: dict):
+
+    def send_purchase_data(self, purchase_data: dict) -> bool:
         """Send purchase data to Kafka topic."""
+
         logging.info(f"Sending purchase data to Kafka: {purchase_data}")
+
         try:
             self.get_producer().send(topic=self.topic, value=purchase_data)
-            # Wait for the message to be sent
-            # future.get(timeout=10)
             self.producer.flush()
             self.producer.close()
             return True
+
         except Exception as e:
             logging.error(f"Error sending message to Kafka: {str(e)}")
             return False
-        
-        
+
+
 class KafkaAdminWrapper:
     def __init__(self):
         self.admin_client = KafkaAdminClient(
@@ -55,7 +56,8 @@ class KafkaAdminWrapper:
             client_id='admin-client'
         )
 
-    def check_if_broker_is_up(self):
+
+    def check_if_broker_is_up(self) -> bool:
         """Check if the Kafka broker is up and reachable."""
         try:
             # Attempt to retrieve cluster metadata

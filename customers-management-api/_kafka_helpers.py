@@ -7,18 +7,23 @@ from logger_config import setup_logger
 
 logger = setup_logger('kafka_helpers')
 
+
 KAFKA_TOPIC = os.getenv("KAFKA_TOPIC")
+KAFKA_BROKER = os.getenv("KAFKA_BROKER")
 
 class NonTopicConsumer():
     def __init__(self):
         self.consumer = KafkaConsumer(
-            bootstrap_servers=os.getenv("KAFKA_BROKER"),
+            bootstrap_servers=KAFKA_BROKER,
             enable_auto_commit=False,  # manual control
             auto_offset_reset='earliest'  # fallback if offset not found
         )
-    def get_consumer(self):
+
+    def get_consumer(self) -> KafkaConsumer:
         return self.consumer
-    
+
+
+
 class KafkaConsumerWrapper:
     def __init__(self, topic=None):
         self.topic = topic or KAFKA_TOPIC
@@ -29,7 +34,7 @@ class KafkaConsumerWrapper:
         )
 
 
-    def get_consumer(self):
+    def get_consumer(self) -> KafkaConsumer:
         return self.consumer
 
 
@@ -42,18 +47,6 @@ class KafkaConsumerWrapper:
         """Get the latest offset for a specific partition of the topic."""
         tp = TopicPartition(self.topic, partition)
         return self.consumer.end_offsets([tp])[tp]
-
-
-    def get_partitions_offset(self) -> dict:
-        """Get the latest offsets for all partitions of the topic."""
-        offsets = {}
-        partitions = self.consumer.partitions_for_topic(self.topic)
-        for p in partitions:
-            tp = TopicPartition(self.topic, p)
-            # print(self.consumer.beginning_offsets([tp])[tp], self.consumer.end_offsets([tp])[tp])
-            offsets[p] = self.consumer.end_offsets([tp])[tp]
-
-        return offsets
 
 
     def get_data_from_specific_offset(self, partition: int, offset: int) -> list:
@@ -113,12 +106,3 @@ class KafkaAdminWrapper:
         except Exception as e:
             logger.error(f"Failed to connect to Kafka broker: {e}")
             return False
-
-# Example usage
-if __name__ == '__main__':
-    consumer = KafkaConsumerWrapper().get_consumer()
-    # print(KafkaConsumerWrapper().get_partitions_offset())
-    # # print(KafkaConsumerWrapper().get_partitions_by_topic())
-    # print(KafkaConsumerWrapper().get_data_from_specific_offset(0, 74700))  # start_offsets = {0: 74700}  # optional: specify starting offset per partition
-    print('DONE')
-    consumer.close()

@@ -1,10 +1,9 @@
-# from flask import Flask, request, jsonify
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import JSONResponse
-
 import logging
 import sys
 import uvicorn
+
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 
 from _helpers import prepare_system
 from _request_helpers import PurchaseData, get_all_users_purchase_data, handle_user_purchase_request
@@ -21,26 +20,18 @@ logging.basicConfig(
 app = FastAPI()
 
 
-@app.get('/getAllUserBuys')
-def home():
-    # ! need to return the all data from the kafka topic + mongo db
-    # ! the data should arrived by the Customers management API
+@app.get('/getAllUserBuys', response_model=None)
+def home() -> JSONResponse | None:
+    """Get all data from Kafka topic + MongoDB via the BE service."""
     return get_all_users_purchase_data()
-    pass
 
 
 
-@app.post('/buy')
+@app.post('/buy', response_model=None)
 def buy(purchase: PurchaseData):
-    try:
-        logging.info(f"Received purchase data: {purchase}")
-        handle_user_purchase_request(purchase)
-        return JSONResponse(status_code=201, content={"status": "success", "data": purchase.model_dump()})
-    except Exception as e:
-        logging.error(f"Error processing purchase request: {e}")
-        err = "Cannot process the request, please try again later"
-        raise HTTPException(status_code=400, detail=err)
-    
+    return handle_user_purchase_request(purchase)
+
+
 
 if __name__ == '__main__':
     prepare_system()

@@ -2,14 +2,14 @@ from multiprocessing import Process
 from time import sleep
 from logger_config import setup_logger
 
-logger = setup_logger('helpers')
 
 from _mongo_helpers import MongoManager
 from _kafka_helpers import KafkaAdminWrapper, KAFKA_TOPIC
 
+logger = setup_logger('helpers')
 
 
-def check_kafka_connection():
+def check_kafka_connection() -> None:
     while True:
         try:
             kafka_admin = KafkaAdminWrapper()
@@ -22,7 +22,7 @@ def check_kafka_connection():
 
 
 
-def check_mongo_connection():
+def check_mongo_connection() -> None:
     mongo_manager = MongoManager()
 
     while True:
@@ -35,7 +35,7 @@ def check_mongo_connection():
 
 
 
-def prepare_system():
+def prepare_system() -> None:
     
     check_mongo_process = Process(target=check_mongo_connection)
     check_kafka_process = Process(target=check_kafka_connection)

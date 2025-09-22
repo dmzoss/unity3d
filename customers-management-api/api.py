@@ -15,7 +15,7 @@ api = FastAPI()
 
 
 @api.get('/')
-def home():
+def home() -> JSONResponse:
     """Get all data from MongoDB."""
     data = MongoHelper().get_collection_data(MONGODB_COLLECTION)
     data_to_return = []
